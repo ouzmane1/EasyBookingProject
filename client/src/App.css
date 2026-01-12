@@ -211,3 +211,66 @@ input:focus {
 .status.active {
   color: var(--secondary-color);
 }
+
+.modal-overlay {
+  position: fixed; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); 
+  backdrop-filter: blur(3px); 
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  z-index: 1000; 
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px; 
+  width: 90%;
+  max-width: 450px; 
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  animation: popIn 0.3s ease-out; 
+}
+
+@keyframes popIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: var(--primary-color);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #999;
+}
+
+.success-message {
+  background-color: #d1fae5; 
+  color: #065f46;          
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  border: 1px solid #34d399;
+  font-weight: 600;
+  animation: popIn 0.3s ease-out;
+}

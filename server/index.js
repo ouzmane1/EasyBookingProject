@@ -74,6 +74,58 @@ app.get('/api/salle', async (req, res) => {
     }
 });
 
+app.post('/api/book', async (req, res) => {
+    const { user_id, salle_id, date_debut, date_fin } = req.body;
+
+    try {
+        if (new Date(date_debut) >= new Date(date_fin)) {
+            return res.status(400).json({ error: "L'heure de fin doit être après l'heure de début." });
+        }
+
+        const conflict = await pool.query(
+            `SELECT * FROM reservations 
+             WHERE salle_id = $1 
+             AND (date_debut < $3 AND date_fin > $2)`,
+            [salle_id, date_debut, date_fin]
+        );
+
+        if (conflict.rows.length > 0) {
+            return res.status(409).json({ error: "Cette salle est déjà réservée sur ce créneau." });
+        }
+
+        const newBooking = await pool.query(
+            `INSERT INTO reservations (user_id, salle_id, date_debut, date_fin) 
+             VALUES ($1, $2, $3, $4) RETURNING *`,
+            [user_id, salle_id, date_debut, date_fin]
+        );
+
+        res.json(newBooking.rows[0]);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Erreur serveur lors de la réservation");
+    }
+});
+
+app.get('/api/my-reservations', async (req, res) => {
+    const { user_id } = req.query;
+
+    try {
+        const result = await pool.query(
+            `SELECT r.id, r.date_debut, r.date_fin, s.nom as nom_salle 
+             FROM reservations r
+             JOIN salle s ON r.salle_id = s.id
+             WHERE r.user_id = $1
+             ORDER BY r.date_debut DESC`,
+            [user_id]
+        );
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Erreur serveur lecture réservations");
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`Serveur Back-end démarré sur http://localhost:${port}`);
