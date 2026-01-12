@@ -1,50 +1,171 @@
-import { useEffect, useState } from 'react'
-import './App.css' // Garde le CSS par défaut de Vite pour l'instant
+import { useState,  } from 'react'
+import './App.css'
 
 function App() {
-  const [salle, setsalle] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+  const [view, setView] = useState('login'); 
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [nom, setNom] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [salles, setSalles] = useState([]);
 
-  useEffect(() => {
-    // Appel à ton API locale
-    fetch('http://localhost:3000/api/salle')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Erreur réseau');
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+    try {
+        const res = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, nom: nom }),
+        });
+        const data = await res.json();
+        
+        if (res.ok) {
+        setUser(data); 
+        fetchSalles();
+        setView('salles');
+        } else {
+        setErrorMsg(data.error || "Erreur lors de l'inscription");
         }
-        return response.json();
-      })
-      .then((data) => {
-        setsalle(data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Erreur lors du fetch:", error);
-        setError("Impossible de charger les salles. Le serveur est-il allumé ?");
-        setLoading(false);
-      });
-  }, []);
+    } catch (err) { setErrorMsg("Erreur serveur"); }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+    try {
+        const res = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+        setUser(data); 
+        setView('salles'); 
+        fetchSalles(); 
+        } else {
+        setErrorMsg(data.error || "Erreur de connexion");
+        }
+    } catch (err) { setErrorMsg("Erreur serveur"); }
+  };
+
+  const fetchSalles = () => {
+    fetch('http://localhost:3000/api/salle')
+      .then(res => res.json())
+      .then(data => setSalles(data))
+      .catch(err => console.error(err));
+  };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h1>EasyBooking - Réservation de Salles</h1>
+    <div className="app-container">
       
-      {loading && <p>Chargement des données...</p>}
-      
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <nav className="navbar">
+        <div className="logo">EasyBooking</div>
+        <div className="user-info">
+          {user ? (
+            <>
+              <span>{user.nom}</span>
+              <button className="btn-logout" onClick={() => {setUser(null); setView('login')}}>
+                Déconnexion
+              </button>
+            </>
+          ) : (
+            <span style={{color: '#6b7280'}}>Espace Client</span>
+          )}
+        </div>
+      </nav>
 
-      <div style={{ display: 'grid', gap: '20px', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))' }}>
-        {salle.map((salle) => (
-          <div key={salle.id} style={{ border: '1px solid #ccc', borderRadius: '8px', padding: '16px', backgroundColor: '#f9f9f9' }}>
-            <h2 style={{ margin: '0 0 10px 0' }}>{salle.nom}</h2>
-            <p><strong>Capacité :</strong> {salle.capacite} personnes</p>
-            <p>{salle.observation}</p>
-            <button style={{ marginTop: '10px', padding: '8px 16px', cursor: 'pointer' }}>
-              Réserver
-            </button>
+      <div className="container">
+        
+        {view === 'login' && (
+          <div className="auth-card">
+            <h2>Bienvenue</h2>
+            {errorMsg && <div style={{color:'#ef4444', marginBottom:'1rem', background:'#fee2e2', padding:'0.5rem', borderRadius:'6px'}}>{errorMsg}</div>}
+            
+            <form onSubmit={handleLogin}>
+              <div className="form-group">
+                <label>Email professionnel</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="nom@entreprise.com"/>
+              </div>
+              <div className="form-group">
+                <label>Mot de passe</label>
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••"/>
+              </div>
+              <button type="submit" className="btn-primary">Se connecter</button>
+            </form>
+            
+            <div className="link-text">
+              Pas encore de compte ? <button onClick={() => setView('register')}>Créer un compte</button>
+            </div>
           </div>
-        ))}
+        )}
+
+        {view === 'register' && (
+          <div className="auth-card">
+            <h2>Création de compte</h2>
+            {errorMsg && <div style={{color:'#ef4444', marginBottom:'1rem', background:'#fee2e2', padding:'0.5rem', borderRadius:'6px'}}>{errorMsg}</div>}
+            
+            <form onSubmit={handleRegister}>
+              <div className="form-group">
+                <label>Nom complet</label>
+                <input type="text" value={nom} onChange={e => setNom(e.target.value)} required placeholder="Ex: Jean Dupont"/>
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} required placeholder="nom@entreprise.com"/>
+              </div>
+              <div className="form-group">
+                <label>Mot de passe</label>
+                <input type="password" value={password} onChange={e => setPassword(e.target.value)} required placeholder="••••••••"/>
+              </div>
+              <button type="submit" className="btn-primary">S'inscrire</button>
+            </form>
+            
+            <div className="link-text">
+              Déjà inscrit ? <button onClick={() => setView('login')}>Se connecter</button>
+            </div>
+          </div>
+        )}
+
+        {view === 'salles' && user && (
+          <div>
+            <h1 style={{marginBottom:'2rem', color: '#1f2937'}}>Nos espaces de travail</h1>
+            
+            <div className="rooms-grid">
+              {salles.map((salle) => (
+                <div key={salle.id} className="room-card">
+                  <div>
+                    <div className="room-header">
+                        <h3 className="room-title">{salle.nom}</h3>
+                        <span className="capacity-badge">{salle.capacite} pers.</span>
+                    </div>
+                    
+                    <p className="room-desc">{salle.observation}</p>
+                    
+                    <div style={{marginBottom: '1.5rem'}}>
+                        {salle.est_active ? 
+                            <div className="status active">
+                                <span style={{fontSize:'1.2em'}}>●</span> Disponible
+                            </div> : 
+                            <div className="status" style={{color:'#ef4444'}}>
+                                <span style={{fontSize:'1.2em'}}>●</span> Indisponible
+                            </div>
+                        }
+                    </div>
+                  </div>
+
+                  <button className="btn-primary">
+                    Réserver ce créneau
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   )
