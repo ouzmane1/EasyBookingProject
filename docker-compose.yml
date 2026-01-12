@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: easybooking_db
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: monmotdepasse
+      POSTGRES_DB: easybooking_db
+    ports:
+      - "5432:5432"
+    volumes:
+      # Persistance des données (pour ne pas tout perdre au redémarrage)
+      - postgres_data:/var/lib/postgresql/data
+      # Script d'initialisation (crée les tables au premier lancement)
+      - ./db:/docker-entrypoint-initdb.d
+    networks:
+      - easybooking-network
+
+volumes:
+  postgres_data:
+
+networks:
+  easybooking-network:
+    driver: bridge
