@@ -1,6 +1,6 @@
 const request = require('supertest');
 
-// On cible l'URL où ton serveur tourne déjà
+// l'URL où ton serveur tourne
 const API_URL = 'http://localhost:3000';
 
 describe('Tests Intégration - API EasyBooking', () => {
@@ -9,12 +9,12 @@ describe('Tests Intégration - API EasyBooking', () => {
     test('GET /api/salle - Retourne la liste des salles (Status 200)', async () => {
         const response = await request(API_URL).get('/api/salle');
         
-        // VÉRIFICATIONS (ASSERTIONS)
+        // VÉRIFICATIONS
         expect(response.status).toBe(200); // Le serveur répond OK
         expect(Array.isArray(response.body)).toBe(true); // On reçoit bien un tableau
         expect(response.body.length).toBeGreaterThan(0); // Il y a au moins une salle
         
-        // Vérifie qu'on a bien les champs attendus
+        // Vérification qu'on a bien les champs attendus
         expect(response.body[0]).toHaveProperty('nom');
         expect(response.body[0]).toHaveProperty('capacite');
     });
