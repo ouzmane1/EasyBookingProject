@@ -1,0 +1,54 @@
+name: CI EasyBooking
+
+on:
+  push:
+    branches: [ "master"]
+  pull_request:
+    branches: [ "master"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: admin          
+          POSTGRES_PASSWORD: monmotdepasse 
+          POSTGRES_DB: easybooking_db   
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Dependencies
+      working-directory: ./server
+      run: npm install
+
+    - name: Initialize Database
+      env:
+        PGPASSWORD: monmotdepasse
+      run: |
+        psql -h localhost -d easybooking_db -U admin -f ./db/schema.sql
+
+    - name: Security Audit
+      working-directory: ./server
+      run: npm audit --audit-level=critical || true
+
+    # On lance les tests 
+    - name: Run Jest Tests
+      working-directory: ./server
+      run: npm test
