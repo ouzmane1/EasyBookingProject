@@ -50,7 +50,15 @@ jobs:
       working-directory: ./server
       run: npm audit --audit-level=critical || true
 
-    # On lance les tests 
-    - name: Run Jest Tests
+    # LANCEMENT DU SERVEUR ET DES TESTS
+    - name: Run Server and Tests
       working-directory: ./server
-      run: npm test
+      env:
+        POSTGRES_USER: admin
+        POSTGRES_PASSWORD: monmotdepasse
+        POSTGRES_DB: easybooking_db
+        PORT: 3000
+      run: |
+        npm start &        
+        sleep 10         
+        npm test        
