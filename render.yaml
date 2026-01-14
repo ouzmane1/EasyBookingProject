@@ -1,0 +1,27 @@
+# Render manifest for EasyBookingProject
+# Creates a managed Postgres DB, a Node web service for the backend and a Static Site for the frontend
+
+databases:
+  - name: easybooking-db
+    engine: postgresql
+    plan: starter
+
+services:
+  - type: web
+    name: easybooking-server
+    env: node
+    branch: test_christian
+    buildCommand: cd server && npm ci
+    startCommand: cd server && npm run migrate && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase: easybooking-db
+
+  - type: static_site
+    name: easybooking-client
+    branch: test_christian
+    buildCommand: cd client && npm ci && npm run build
+    publishPath: client/dist
+    envVars: []
