@@ -59,6 +59,6 @@ jobs:
         POSTGRES_DB: easybooking_db
         PORT: 3000
       run: |
-        npm index.js &        
+        node index.js &        
         sleep 10         
         npm test        
