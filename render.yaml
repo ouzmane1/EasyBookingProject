@@ -1,5 +1,6 @@
 # Render manifest for EasyBookingProject
 # Creates a managed Postgres DB, a Node web service for the backend and a Static Site for the frontend
+# deploy-bump: 2026-01-14T14:20:00Z
 
 databases:
   - name: easybooking-db
