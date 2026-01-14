@@ -90,7 +90,8 @@ app.post('/api/book', async (req, res) => {
         );
 
         if (conflict.rows.length > 0) {
-            return res.status(409).json({ error: "Cette salle est déjà réservée sur ce créneau." });
+            return res.status(409).json(
+                { error: "Cette salle est déjà réservée sur ce créneau." });
         }
 
         const newBooking = await pool.query(
