@@ -4,7 +4,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -16,6 +16,10 @@ const pool = new Pool({
     password: 'monmotdepasse',
     port: 5432,
 });
+
+// Expose the pool for tests to allow graceful shutdown
+module.exports = app;
+module.exports.pool = pool;
 
 app.post('/api/register', async (req, res) => {
     const { email, password, nom } = req.body;
@@ -127,6 +131,11 @@ app.get('/api/my-reservations', async (req, res) => {
 });
 
 
-app.listen(port, () => {
-    console.log(`Serveur Back-end démarré sur http://localhost:${port}`);
-});
+if (require.main === module) {
+    app.listen(port, () => {
+        console.log(`Serveur Back-end démarré sur http://localhost:${port}`);
+    });
+}
+
+module.exports = app;
+module.exports.pool = pool;
