@@ -63,3 +63,21 @@ Le projet utilise Docker Compose pour lancer PostgreSQL et importer automatiquem
 ```bash
 docker-compose up -d
 ```
+
+### 3. Lancé le Backend
+
+```bash
+cd server
+npm install
+node index.js
+```
+
+### 4. Lancé le Frontend
+
+```bash
+cd client
+npm install
+npm start
+```
+
+
