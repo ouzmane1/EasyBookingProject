@@ -8,8 +8,10 @@ Ce projet a été conçu avec une approche **"Quality First"**, intégrant une c
 ### Participant du Projet
 
 **Ousmane NDOME :** ousmane.ndome@efrei.net
+
 **Christian CORCIU :** christian.corciu@efrei.net
 
+---
 ##  Fonctionnalités Clés
 
 ### 1. Gestion Utilisateur
