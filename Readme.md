@@ -5,6 +5,10 @@
 Ce projet a été conçu avec une approche **"Quality First"**, intégrant une couverture de tests (Unitaires, Intégration, Performance, Sécurité) et un pipeline d'Intégration Continue (CI/CD) automatisé.
 
 ---
+### Participant du Projet
+
+**Ousmane NDOME :** ousmane.ndome@efrei.net
+**Christian CORCIU :** christian.corciu@efrei.net
 
 ##  Fonctionnalités Clés
 
